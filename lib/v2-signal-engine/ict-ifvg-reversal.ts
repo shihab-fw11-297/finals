@@ -879,11 +879,25 @@ function findPriorityTarget(
 
 function previousSessionTarget(candles: Candle[], index: number, direction: Direction, entry: number): number | null {
   const current = zonedDateParts(candles[index].timestamp, SESSION_TIMEZONE).date;
-  const previous = candles.slice(Math.max(0, index - 288), index).filter((candle) => zonedDateParts(candle.timestamp, SESSION_TIMEZONE).date < current);
-  if (previous.length < 3) return null;
-  const level = direction === "BUY" ? Math.max(...previous.map((candle) => candle.high)) : Math.min(...previous.map((candle) => candle.low));
+  let p = index - 1;
+  const limit = Math.max(0, index - 288);
+  while (p >= limit && zonedDateParts(candles[p].timestamp, SESSION_TIMEZONE).date >= current) {
+    p--;
+  }
+  if (p < limit) return null;
+  
+  let level = direction === "BUY" ? -Infinity : Infinity;
+  for (let i = limit; i <= p; i++) {
+    if (direction === "BUY") {
+      if (candles[i].high > level) level = candles[i].high;
+    } else {
+      if (candles[i].low < level) level = candles[i].low;
+    }
+  }
+  if (level === -Infinity || level === Infinity) return null;
   return direction === "BUY" ? (level > entry ? level : null) : (level < entry ? level : null);
 }
+
 
 function hasLiquiditySweepBeforeDisplacement(
   candles: Candle[],
