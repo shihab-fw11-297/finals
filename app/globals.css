@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0f1117;
+  --foreground: #d1d4dc;
+  --surface: #1e222d;
+  --surface-hover: #2a2e39;
+  --border: #2a2e39;
+  --text-primary: #d1d4dc;
+  --text-secondary: #787b86;
+  --text-muted: #4c525e;
+  --accent: #2962ff;
+  --accent-hover: #1e53e5;
+  --bullish: #26a69a;
+  --bearish: #ef5350;
+  --chart-bg: #131722;
+  --chart-grid: rgba(42, 46, 57, 0.6);
+  --toolbar-bg: #1e222d;
+  --tooltip-bg: rgba(19, 23, 34, 0.94);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* ── Chart Toolbar ───────────────────────────────────── */
+.chart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  min-height: 36px;
+}
+
+.chart-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.chart-toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin: 0 6px;
+}
+
+.chart-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+  white-space: nowrap;
+  user-select: none;
+}
+.chart-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+.chart-btn--active {
+  background: var(--accent);
+  color: #fff;
+}
+.chart-btn--active:hover {
+  background: var(--accent-hover);
+  color: #fff;
+}
+.chart-btn--go-live {
+  background: rgba(38, 166, 154, 0.15);
+  color: var(--bullish);
+  font-weight: 600;
+}
+.chart-btn--go-live:hover {
+  background: rgba(38, 166, 154, 0.25);
+}
+.chart-btn--icon {
+  padding: 0 6px;
+  font-size: 14px;
+  min-width: 28px;
+}
+
+/* Timeframe pill buttons */
+.tf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+  letter-spacing: 0.02em;
+}
+.tf-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+.tf-btn--active {
+  background: rgba(41, 98, 255, 0.18);
+  color: var(--accent);
+}
+
+/* ── Floating Tooltip ────────────────────────────────── */
+.chart-tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 50;
+  padding: 8px 10px;
+  background: var(--tooltip-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  min-width: 160px;
+  max-width: 280px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+.chart-tooltip--visible {
+  opacity: 1;
+}
+.chart-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.chart-tooltip-label {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.chart-tooltip-value {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.chart-tooltip-time {
+  color: var(--text-secondary);
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+.chart-tooltip-signal {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--bullish);
+  font-weight: 600;
+}
+.chart-tooltip-bullish { color: var(--bullish); }
+.chart-tooltip-bearish { color: var(--bearish); }
+
+/* ── OHLC Legend (top-left overlay) ──────────────────── */
+.chart-legend {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+.chart-legend-symbol {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.chart-legend-value {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Go Live Floating Button ─────────────────────────── */
+.go-live-float {
+  position: absolute;
+  bottom: 42px;
+  right: 76px;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid rgba(38, 166, 154, 0.3);
+  border-radius: 4px;
+  background: rgba(38, 166, 154, 0.12);
+  color: var(--bullish);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  pointer-events: auto;
+}
+.go-live-float:hover {
+  background: rgba(38, 166, 154, 0.22);
+}
+.go-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bullish);
+  animation: go-live-pulse 1.5s infinite;
+}
+
+@keyframes go-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ── State Overlay (dark) ────────────────────────────── */
+.chart-state-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 17, 23, 0.7);
+  backdrop-filter: blur(2px);
+  padding: 24px;
+  text-align: center;
+}
+.chart-state-overlay--compact {
+  inset: auto;
+  right: 12px;
+  top: 12px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--tooltip-bg);
+  backdrop-filter: blur(8px);
+  text-align: left;
+}
+.chart-state-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.chart-state-detail {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--bearish);
+}
+
+/* ── Current Price Line Label ────────────────────────── */
+.chart-current-price {
+  position: absolute;
+  right: 0;
+  z-index: 15;
+  padding: 2px 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border-radius: 2px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* ── Candle Reading & Context Overlays (dark) ────────── */
+.chart-reading-overlay {
+  position: absolute;
+  left: 12px;
+  top: 36px;
+  z-index: 20;
+  max-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--tooltip-bg);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+/* ── Scrollbar styling ───────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
