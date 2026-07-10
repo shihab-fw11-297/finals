@@ -7,7 +7,7 @@ export type TimeframeMapping = {
   ltf: ContextTimeframe;
   itf: ContextTimeframe;
   htf: ContextTimeframe;
-  modeName: "1M SCALPING" | "5M SCALPING" | "15M INTRADAY" | "1H SWING";
+  modeName: "1M SCALPING" | "5M SCALPING" | "15M INTRADAY" | "1H SWING" | "30M INTRADAY";
 };
 
 export type AggregatedCandle = Candle & {
