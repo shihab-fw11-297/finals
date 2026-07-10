@@ -356,9 +356,14 @@ export function MarketChartApp() {
       return [];
     }
 
-    return replay.enabled
+    const zones = replay.enabled
       ? getReplayVisibleZones(marketStructure.liquidityZones, replayIndex)
       : marketStructure.liquidityZones;
+
+    const activeZones = zones.filter((z) => !z.swept);
+    const sweptZones = zones.filter((z) => z.swept).sort((a, b) => b.timestamp - a.timestamp).slice(0, 15);
+
+    return [...activeZones, ...sweptZones];
   }, [
     marketStructure.liquidityZones,
     markerVisibility.liquidity,
