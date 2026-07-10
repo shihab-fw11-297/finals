@@ -7,6 +7,7 @@ export type SessionVwapPoint = {
 };
 
 const formatterCache = new Map<string, Intl.DateTimeFormat>();
+const zonedDateCache = new Map<string, { date: string; hour: number; minute: number }>();
 
 export function calculateEMA(candles: Candle[], period: number): Array<number | null> {
   const output: Array<number | null> = Array(candles.length).fill(null);
@@ -186,6 +187,12 @@ export function zonedDateParts(timestamp: number, timezone: string): {
   hour: number;
   minute: number;
 } {
+  const cacheKey = `${timestamp}:${timezone}`;
+  const cached = zonedDateCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   let formatter = formatterCache.get(timezone);
   if (!formatter) {
     formatter = new Intl.DateTimeFormat("en-CA", {
@@ -200,11 +207,17 @@ export function zonedDateParts(timestamp: number, timezone: string): {
     formatterCache.set(timezone, formatter);
   }
   const parts = Object.fromEntries(formatter.formatToParts(timestamp).map((part) => [part.type, part.value]));
-  return {
+  const result = {
     date: `${parts.year}-${parts.month}-${parts.day}`,
     hour: Number(parts.hour),
     minute: Number(parts.minute),
   };
+
+  if (zonedDateCache.size > 100000) {
+    zonedDateCache.clear();
+  }
+  zonedDateCache.set(cacheKey, result);
+  return result;
 }
 
 export function clockWindowAt(
