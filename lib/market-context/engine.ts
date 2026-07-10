@@ -31,6 +31,7 @@ import type {
   VolatilityContext,
   WaitContext,
 } from "./types";
+import { zonedDateParts } from "../v2-signal-engine/indicators";
 
 const contextCache = new Map<string, MarketContextResult>();
 
@@ -560,17 +561,24 @@ function calculateContextScore(input: { htfBias: HtfBias; itfSetup: ItfSetupCont
 }
 
 function getPreviousDayRange(candles: Candle[]): { high: number; low: number } | null {
-  const days = new Map<string, Candle[]>();
-  for (const candle of candles) {
-    const day = new Date(candle.timestamp).toISOString().slice(0, 10);
-    const group = days.get(day) ?? [];
-    group.push(candle);
-    days.set(day, group);
+  if (candles.length === 0) return null;
+  const latestDateStr = new Date(candles[candles.length - 1].timestamp).toISOString().slice(0, 10);
+  let p = candles.length - 2;
+  while (p >= 0 && new Date(candles[p].timestamp).toISOString().slice(0, 10) === latestDateStr) {
+    p--;
   }
-  const entries = [...days.values()];
-  if (entries.length < 2) return null;
-  const previous = entries.at(-2)!;
-  return { high: Math.max(...previous.map((candle) => candle.high)), low: Math.min(...previous.map((candle) => candle.low)) };
+  if (p < 0) return null;
+  
+  const prevDateStr = new Date(candles[p].timestamp).toISOString().slice(0, 10);
+  let high = candles[p].high;
+  let low = candles[p].low;
+  p--;
+  while (p >= 0 && new Date(candles[p].timestamp).toISOString().slice(0, 10) === prevDateStr) {
+    high = Math.max(high, candles[p].high);
+    low = Math.min(low, candles[p].low);
+    p--;
+  }
+  return { high, low };
 }
 
 function lowerBoundPrice(levels: KeyLevel[], price: number): number {
@@ -585,8 +593,7 @@ function lowerBoundPrice(levels: KeyLevel[], price: number): number {
 }
 
 function zonedHour(timestamp: number, timeZone: string): number {
-  const hour = new Intl.DateTimeFormat("en-US", { timeZone, hour: "2-digit", hourCycle: "h23" }).formatToParts(timestamp).find((part) => part.type === "hour")?.value;
-  return Number(hour ?? 0);
+  return zonedDateParts(timestamp, timeZone).hour;
 }
 
 function buildContextKey(input: MarketContextInput, candles: Candle[]): string {
