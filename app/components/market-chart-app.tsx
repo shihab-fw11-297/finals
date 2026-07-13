@@ -114,7 +114,7 @@ const SignalHistoryTable = dynamic(
 );
 
 const TIMEFRAMES: Timeframe[] = ["1m", "5m", "15m", "30m", "1h"];
-const SYMBOL_OPTIONS = ["XAUUSD", "BTCUSD"] as const;
+const SYMBOL_OPTIONS = ["XAUUSD", "BTCUSD","EURUSD","GBPJPY","GBPUSD","USDJPY"] as const;
 const SENSITIVITIES: MarkerSensitivity[] = ["low", "normal", "high"];
 const REPLAY_SPEEDS: ReplayState["speed"][] = [1, 2, 5, 10];
 
